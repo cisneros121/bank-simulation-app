@@ -1,10 +1,14 @@
 package com.ccydeo.repository;
 
+import com.ccydeo.exception.RecordNotFoundException;
 import com.ccydeo.model.Account;
+import com.ccydeo.service.impl.TransactionServiceImpl;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 @Component
 public class AccountRepository {
 
@@ -18,5 +22,11 @@ public class AccountRepository {
     public List<Account> findAll() {
 
         return accountList;
+    }
+
+    public Account findById(UUID id) {
+
+return accountList.stream().filter(account -> account.getId().equals(id))
+        .findAny().orElseThrow(()->new RecordNotFoundException("Account does not exist in the database"));
     }
 }
