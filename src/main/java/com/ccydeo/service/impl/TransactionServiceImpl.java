@@ -89,7 +89,7 @@ private final TransactionRepository transactionRepository;
     }
     @Override
     public List<Transaction> findAllTransaction() {
-        return null;
+        return TransactionRepository.findAll();
     }
 
 
