@@ -3,7 +3,7 @@ package com.ccydeo.service.impl;
 import com.ccydeo.enums.AccountType;
 import com.ccydeo.model.Account;
 import com.ccydeo.repository.AccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ccydeo.service.AccountService;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
