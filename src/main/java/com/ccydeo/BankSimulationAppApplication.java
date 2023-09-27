@@ -15,8 +15,8 @@ import java.util.Date;
 public class BankSimulationAppApplication {
 
     public static void main(String[] args) {
-        ApplicationContext container=SpringApplication.run(BankSimulationAppApplication.class, args);
-
+        ApplicationContext container = SpringApplication.run(BankSimulationAppApplication.class, args);
+/*
         //get beans for account and transaction
         AccountServiceImpl accountBean = container.getBean(AccountServiceImpl.class);
         TransactionServiceImpl transactionBean = container.getBean(TransactionServiceImpl.class);
@@ -35,4 +35,6 @@ transactionBean.makeTransfer(sender,receiver,new BigDecimal(40),new Date(),"Tran
 
     }
 
+ */
+    }
 }
