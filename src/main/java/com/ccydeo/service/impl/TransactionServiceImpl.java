@@ -3,9 +3,11 @@ package com.ccydeo.service.impl;
 import com.ccydeo.enums.AccountType;
 import com.ccydeo.exception.AccountOwnerShipException;
 import com.ccydeo.exception.BadRequestException;
+import com.ccydeo.exception.InsufficientBalanceException;
 import com.ccydeo.model.Account;
 import com.ccydeo.model.Transaction;
 import com.ccydeo.repository.AccountRepository;
+import com.ccydeo.repository.TransactionRepository;
 import com.ccydeo.service.TransactionService;
 import org.springframework.stereotype.Component;
 
@@ -18,16 +20,41 @@ import java.util.UUID;
 public class TransactionServiceImpl implements TransactionService {
 
 private final AccountRepository accountRepository;
+private final TransactionRepository transactionRepository;
 
-    public TransactionServiceImpl(AccountRepository accountRepository) {
+    public TransactionServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
     public Transaction makeTransfer(Account sender, Account receiver, BigDecimal amount, Date creationDate, String message) {
 
         validateAccount(sender,receiver);
-        return null;
+        checkAccountOwnerShip(sender,receiver);
+        executeBalanceAndUpdateIfRequired(amount,sender,receiver);
+        Transaction transaction=Transaction.builder().sender(sender.getId()).receiver(receiver.getId()).amount(amount).creationDate(creationDate)
+                .message(message).build();
+
+        return transactionRepository.save(transaction);
+    }
+
+    private void executeBalanceAndUpdateIfRequired(BigDecimal amount, Account sender, Account receiver) {
+        if (checkSenderBalance(sender,amount)){
+            //update the balance
+            sender.setBalance(sender.getBalance().subtract(amount));
+            receiver.setBalance(receiver.getBalance().add(amount));
+        }else {
+            throw new InsufficientBalanceException("Balance is not enough for this transfer");
+        }
+
+    }
+
+    private boolean checkSenderBalance(Account sender, BigDecimal amount) {
+        //verify sender has enough balance to send to receiver
+        return sender.getBalance().subtract(amount).compareTo(BigDecimal.ZERO)>=0;
+
+
     }
 
     private void validateAccount(Account sender,Account receiver){
@@ -46,7 +73,6 @@ private final AccountRepository accountRepository;
 
         findAccountById(sender.getId());
         findAccountById(receiver.getId());
-
         checkAccountOwnerShip(sender,receiver);
 
 
